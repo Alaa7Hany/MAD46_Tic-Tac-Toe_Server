@@ -35,6 +35,14 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
+    @Override
+    public void stop() throws Exception {
+        // TODO: Close connections with all clients
+        super.stop(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+    
+    
+
     public static void main(String[] args) {
           
         launch();

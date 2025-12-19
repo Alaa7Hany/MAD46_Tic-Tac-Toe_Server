@@ -4,10 +4,17 @@
  */
 package com.mycompany.mad46_tic.tac.toe_server;
 
+import com.mycompany.mad46_tic_tac_toe_server.db.DatabaseHandler;
+import com.mycompany.tictactoeshared.LoginDTO;
+import com.mycompany.tictactoeshared.PlayerDTO;
+import com.mycompany.tictactoeshared.Request;
+import com.mycompany.tictactoeshared.RequestType;
+import com.mycompany.tictactoeshared.Response;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  *
@@ -39,11 +46,18 @@ public class ClientHandler extends Thread {
         try {
             while (true) {
 
-                Object received = input.readObject();
-
-                System.out.println("Client Sent: " + received);
-
-                output.writeObject("Server Echo: " + received);
+                Request received = (Request) input.readObject();
+                
+                
+                switch(received.getType()){
+                    case LOGIN:
+                        login((LoginDTO) received.getData());
+                        break;
+                    default:
+                        break;
+                }
+                
+                
 
             }
 
@@ -53,6 +67,27 @@ public class ClientHandler extends Thread {
             closeConnection();
         }
     }
+    
+    
+    private void login(LoginDTO loginData){
+        try {
+            PlayerDTO playerData = new DatabaseHandler().login(loginData);
+            System.out.println("Player Data retrieved");
+            Response response;
+            if(playerData != null)
+                response = new Response(Response.Status.SUCCESS, playerData);
+            else
+                response = new Response(Response.Status.FAILURE,new PlayerDTO("Test", 4, true));
+            output.writeObject(response);
+            output.flush();
+        } catch (SQLException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (IOException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+    
+    
 
     private void closeConnection() {
 

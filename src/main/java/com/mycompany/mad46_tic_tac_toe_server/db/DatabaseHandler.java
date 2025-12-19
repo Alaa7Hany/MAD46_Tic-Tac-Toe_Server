@@ -25,9 +25,9 @@ public class DatabaseHandler {
     public PlayerDTO login(LoginDTO loginDTO) {
 
         String sql =
-        "SELECT username, score, is_online " +
-        "FROM players " +
-        "WHERE username=? AND password=?";
+        "SELECT NAME, score, STATUS " +
+        "FROM USERS " +
+        "WHERE NAME=? AND password=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -38,9 +38,9 @@ public class DatabaseHandler {
 
             if (rs.next()) {
                 return new PlayerDTO(
-                        rs.getString("username"),
+                        rs.getString("NAME"),
                         rs.getInt("score"),
-                        rs.getBoolean("is_online")
+                        rs.getBoolean("STATUS")
                 );
             }
 
@@ -54,7 +54,7 @@ public class DatabaseHandler {
     public PlayerDTO register(LoginDTO loginDTO) {
 
         String sql =
-        "INSERT INTO players (username, password, score, is_online) " +
+        "INSERT INTO USERS (NAME, password, score, STATUS) " +
         "VALUES (?, ?, 0, true)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
