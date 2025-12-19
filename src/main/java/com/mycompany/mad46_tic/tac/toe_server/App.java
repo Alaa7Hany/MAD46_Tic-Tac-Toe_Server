@@ -22,8 +22,8 @@ public class App extends Application {
         scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
         stage.show();
-        
-        
+       // Start server in background thread
+       new Thread(() -> new TicTacToeServer()).start();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -36,6 +36,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+          
         launch();
         try {
             System.out.println("Starting server...");
