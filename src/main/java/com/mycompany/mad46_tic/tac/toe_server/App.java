@@ -1,5 +1,6 @@
 package com.mycompany.mad46_tic.tac.toe_server;
 
+import com.mycompany.mad46_tic_tac_toe_server.db.DBManager;
 import com.mycompany.tictactoeshared.PlayerDTO;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -36,6 +37,14 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
+        try {
+            System.out.println("Starting server...");
+            DBManager.getConnection();
+            System.out.println("DB CONNECTED SUCCESSFULLY ✅");
+        } catch (Exception e) {
+            System.out.println("DB CONNECTION FAILED ❌");
+            e.printStackTrace();
+        }
     }
 
 }

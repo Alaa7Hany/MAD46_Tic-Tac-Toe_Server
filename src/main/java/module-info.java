@@ -5,4 +5,6 @@ module com.mycompany.mad46_tic.tac.toe_server {
     opens com.mycompany.mad46_tic.tac.toe_server to javafx.fxml;
     exports com.mycompany.mad46_tic.tac.toe_server;
     requires com.mycompany.tictactoeshared;
+    requires java.sql;
+    requires derbyclient;
 }
