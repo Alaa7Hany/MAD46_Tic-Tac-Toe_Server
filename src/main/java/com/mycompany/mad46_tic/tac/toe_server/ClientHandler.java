@@ -15,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
@@ -53,6 +54,9 @@ public class ClientHandler extends Thread {
                     case LOGIN:
                         login((LoginDTO) received.getData());
                         break;
+                    case GET_ONLINE_PLAYERS:
+                        getOnlinePlayers();
+                        break;
                     default:
                         break;
                 }
@@ -86,6 +90,24 @@ public class ClientHandler extends Thread {
             System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
+    
+    
+    private void getOnlinePlayers() {
+
+        try {
+            List<PlayerDTO> players =
+                new DatabaseHandler().getOnlinePlayers();
+
+            Response response =
+                new Response(Response.Status.SUCCESS, players);
+
+            output.writeObject(response);
+            output.flush();
+
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace();
+        }
+    }   
     
     
 
