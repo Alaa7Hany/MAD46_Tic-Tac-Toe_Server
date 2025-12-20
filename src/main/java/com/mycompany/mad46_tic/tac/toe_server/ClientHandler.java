@@ -11,6 +11,7 @@ import com.mycompany.tictactoeshared.PlayerDTO;
 import com.mycompany.tictactoeshared.Request;
 import com.mycompany.tictactoeshared.RequestType;
 import com.mycompany.tictactoeshared.Response;
+import com.mycompany.tictactoeshared.Response.Status;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -61,6 +62,14 @@ public class ClientHandler extends Thread {
                     case INVITE_PLAYER:
                         handleInvite((InvitationDTO) received.getData());
                         break;
+                    case ACCEPT_INVITE:
+                        InvitationDTO acceptInvite = (InvitationDTO) received.getData();
+                        handleAcceptInvite(acceptInvite);
+                        break;
+                    case REJECT_INVITE:
+                        InvitationDTO rejectInvite = (InvitationDTO) received.getData();
+                        handleRejectInvite(rejectInvite);
+                        break;
                         
                     default:
                         break;
@@ -108,7 +117,7 @@ public class ClientHandler extends Thread {
             System.out.println("checking client: " + client.getUsername());
             if (invite.getToUsername().equals(client.getUsername())) {
                  System.out.println("Found target client: " + client.getUsername());
-                // UnComment when finish the connection srry 
+                // UnComment when finish the connection *** sorry 
                 //try {
                     //Response response = new Response(Response.Status.SUCCESS,invite);
                     //client.output.writeObject(response);
@@ -122,6 +131,29 @@ public class ClientHandler extends Thread {
         
         System.out.println("not found");
 
+    }
+    
+    private void handleAcceptInvite(InvitationDTO invite) { // will not run 
+
+        String player1="Empty",player2="Empty"; // get the 2 players 
+
+        if (player1 != null && player2 != null) {
+            // Notify both: game starting!
+            Response startGame = new Response(Status.SUCCESS, "StartGame");
+            
+            // send response to the 2 players 
+
+            System.out.println(invite.getFromUsername() + " vs " + invite.getToUsername() + " - Game ON!");
+        }
+    }
+    
+    private void handleRejectInvite(InvitationDTO invite) { // will not run 
+        String inviter="Empty";
+        if (inviter != null) {
+            Response rejected = new Response(Status.SUCCESS, "INVITE_REJECTED");
+            // send response 
+            
+        }
     }
     
     private void closeConnection() {
