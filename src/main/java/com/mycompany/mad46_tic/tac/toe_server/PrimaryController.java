@@ -1,6 +1,8 @@
 package com.mycompany.mad46_tic.tac.toe_server;
 
+import com.mycompany.mad46_tic_tac_toe_server.db.DatabaseHandler;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -11,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
@@ -37,18 +40,28 @@ public class PrimaryController implements Initializable {
 
     private int onlineNum;
     private int offlineNum;
+    
+    private DatabaseHandler dbh;
+    
+    private TicTacToeServer server;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO: Get data from database
+        server = new TicTacToeServer();
+         
+        Image offlineImg = new Image(getClass().getResourceAsStream("/images/offline_icon.png"));
+        offOnImage.setImage(offlineImg);
         
-        onlineNum = 70;
-        offlineNum = 50;
-      
-        initData();
+        resetUI();
+        
+        try {
+            dbh = new DatabaseHandler();
+        } catch (SQLException ex) {
+            System.getLogger(PrimaryController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
 
     }
     
@@ -83,7 +96,17 @@ public class PrimaryController implements Initializable {
             }
         }
     }
+    
+    private void resetUI() {
+        Platform.runLater(() -> {
+            
+            totalUsersLbl.setText("--");
+            onlineUsersLbl.setText("--");
+            offlineUsersLbl.setText("--");
 
+            pieChart.getData().clear();
+        });
+    }
 
     public void updateData(int onlineUsers, int offlineUsers) {
         
@@ -102,11 +125,42 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private void onStartPressed(ActionEvent event) {
-        updateData(100, 200);
+        if(!TicTacToeServer.isRunning){
+            Thread serverThread = new Thread(() -> {
+                if (server == null) server = new TicTacToeServer();
+                server.startServer();
+            });
+            // This ensures the thread dies when the app closes
+            serverThread.setDaemon(true); 
+            serverThread.start();
+            
+            onlineNum = dbh.getOnlinePlayers(); 
+            offlineNum = dbh.getTotalPlayers() - onlineNum;
+            Platform.runLater(() -> initData());
+            try {
+                Image onlineImg = new Image(getClass().getResourceAsStream("/images/online_icon.png"));
+                offOnImage.setImage(onlineImg);
+            } catch (Exception e) {
+                System.out.println("Error loading online image: " + e.getMessage());
+            }
+        }
     }
 
     @FXML
     private void onStopPressed(ActionEvent event) {
-        // Logic for stop button
+       if(TicTacToeServer.isRunning){
+            if (server != null) {
+               server.stopServer();
+            }
+            
+            resetUI();
+           
+            try {
+                Image offlineImg = new Image(getClass().getResourceAsStream("/images/offline_icon.png"));
+                offOnImage.setImage(offlineImg);
+            } catch (Exception e) {
+                System.out.println("Error loading offline image: " + e.getMessage());
+            }
+       }
     }
 }

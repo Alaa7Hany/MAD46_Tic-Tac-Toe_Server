@@ -64,6 +64,7 @@ public class ClientHandler extends Thread {
         } catch (IOException | ClassNotFoundException ex) {
             System.out.println("Client disconnected!");
         } finally {
+            TicTacToeServer.clients.remove(this);
             closeConnection();
         }
     }
@@ -90,7 +91,7 @@ public class ClientHandler extends Thread {
     
     
 
-    private void closeConnection() {
+    public void closeConnection() {
 
         try {
             input.close();

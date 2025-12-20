@@ -75,4 +75,36 @@ public class DatabaseHandler {
         }
     }
     
+    public int getOnlinePlayers() {
+        int onlineNum = 0;
+        
+        String sql = "SELECT COUNT(*) FROM USERS WHERE STATUS = 1"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                onlineNum = rs.getInt(1); 
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return onlineNum;
+    }
+    
+    public int getTotalPlayers() {
+        int offlineNum = 0;
+        String sql = "SELECT COUNT(*) FROM USERS"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                offlineNum = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return offlineNum;
+    }
+    
 }

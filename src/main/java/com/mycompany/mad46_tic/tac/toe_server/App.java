@@ -21,9 +21,8 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
-       // Start server in background thread
-       new Thread(() -> new TicTacToeServer()).start();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -37,15 +36,13 @@ public class App extends Application {
 
     @Override
     public void stop() throws Exception {
-        // TODO: Close connections with all clients
+        TicTacToeServer.clearClients();
         super.stop(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
     
     
 
     public static void main(String[] args) {
-          
-        launch();
         try {
             System.out.println("Starting server...");
             DBManager.getConnection();
@@ -54,6 +51,8 @@ public class App extends Application {
             System.out.println("DB CONNECTION FAILED ❌");
             e.printStackTrace();
         }
+        launch();
+
     }
 
 }
