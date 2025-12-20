@@ -73,6 +73,7 @@ public class ClientHandler extends Thread {
         try {
             PlayerDTO playerData = new DatabaseHandler().login(loginData);
             System.out.println("Player Data retrieved");
+            System.out.println(playerData.getUsername());
             Response response;
             if(playerData != null)
                 response = new Response(Response.Status.SUCCESS, playerData);
