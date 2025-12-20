@@ -57,7 +57,7 @@ public class DatabaseHandler {
 
         String sql =
         "INSERT INTO USERS (NAME, password, score, STATUS) " +
-        "VALUES (?, ?, 0, true)";
+        "VALUES (?, ?, 0, 1)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -77,7 +77,9 @@ public class DatabaseHandler {
         }
     }
     
-    public List<PlayerDTO> getOnlinePlayers() {
+
+    //for lobby
+    public List<PlayerDTO> getOnlinePlayersForLobby() {
 
         List<PlayerDTO> players = new ArrayList<>();
 
@@ -104,6 +106,38 @@ public class DatabaseHandler {
         }
 
         return players;
+    }
+    
+    public int getOnlinePlayers() {
+        int onlineNum = 0;
+        
+        String sql = "SELECT COUNT(*) FROM USERS WHERE STATUS = 1"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                onlineNum = rs.getInt(1); 
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return onlineNum;
+    }
+    
+    public int getTotalPlayers() {
+        int offlineNum = 0;
+        String sql = "SELECT COUNT(*) FROM USERS"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                offlineNum = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return offlineNum;
     }
     
 }

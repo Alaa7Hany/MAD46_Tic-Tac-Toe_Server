@@ -8,7 +8,6 @@ import com.mycompany.mad46_tic_tac_toe_server.db.DatabaseHandler;
 import com.mycompany.tictactoeshared.LoginDTO;
 import com.mycompany.tictactoeshared.PlayerDTO;
 import com.mycompany.tictactoeshared.Request;
-import com.mycompany.tictactoeshared.RequestType;
 import com.mycompany.tictactoeshared.Response;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -55,7 +54,10 @@ public class ClientHandler extends Thread {
                         login((LoginDTO) received.getData());
                         break;
                     case GET_ONLINE_PLAYERS:
-                        getOnlinePlayers();
+                        getOnlinePlayersForLobby();
+                        break;
+                    case REGISTER:
+                        register((LoginDTO) received.getData());
                         break;
                     default:
                         break;
@@ -68,6 +70,7 @@ public class ClientHandler extends Thread {
         } catch (IOException | ClassNotFoundException ex) {
             System.out.println("Client disconnected!");
         } finally {
+            TicTacToeServer.clients.remove(this);
             closeConnection();
         }
     }
@@ -76,12 +79,29 @@ public class ClientHandler extends Thread {
     private void login(LoginDTO loginData){
         try {
             PlayerDTO playerData = new DatabaseHandler().login(loginData);
+             Response response;
+            if(playerData != null)
+                response = new Response(Response.Status.SUCCESS, playerData);
+            else
+                response = new Response(Response.Status.FAILURE,"Failed to login");
+            output.writeObject(response);
+            output.flush();
+        } catch (SQLException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (IOException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+    private void register(LoginDTO loginData){
+        try {
+            PlayerDTO playerData = new DatabaseHandler().register(loginData);
             System.out.println("Player Data retrieved");
+            System.out.println(playerData.getUsername());
             Response response;
             if(playerData != null)
                 response = new Response(Response.Status.SUCCESS, playerData);
             else
-                response = new Response(Response.Status.FAILURE,new PlayerDTO("Test", 4, true));
+                response = new Response(Response.Status.FAILURE,"Failed Registeration");
             output.writeObject(response);
             output.flush();
         } catch (SQLException ex) {
@@ -92,11 +112,11 @@ public class ClientHandler extends Thread {
     }
     
     
-    private void getOnlinePlayers() {
+    private void getOnlinePlayersForLobby() {
 
         try {
             List<PlayerDTO> players =
-                new DatabaseHandler().getOnlinePlayers();
+                new DatabaseHandler().getOnlinePlayersForLobby();
 
             Response response =
                 new Response(Response.Status.SUCCESS, players);
@@ -111,7 +131,7 @@ public class ClientHandler extends Thread {
     
     
 
-    private void closeConnection() {
+    public void closeConnection() {
 
         try {
             input.close();
