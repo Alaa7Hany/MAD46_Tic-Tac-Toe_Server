@@ -53,6 +53,9 @@ public class ClientHandler extends Thread {
                     case LOGIN:
                         login((LoginDTO) received.getData());
                         break;
+                    case REGISTER:
+                        register((LoginDTO) received.getData());
+                        break;
                     default:
                         break;
                 }
@@ -73,13 +76,29 @@ public class ClientHandler extends Thread {
     private void login(LoginDTO loginData){
         try {
             PlayerDTO playerData = new DatabaseHandler().login(loginData);
+             Response response;
+            if(playerData != null)
+                response = new Response(Response.Status.SUCCESS, playerData);
+            else
+                response = new Response(Response.Status.FAILURE,"Failed to login");
+            output.writeObject(response);
+            output.flush();
+        } catch (SQLException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        } catch (IOException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+    private void register(LoginDTO loginData){
+        try {
+            PlayerDTO playerData = new DatabaseHandler().register(loginData);
             System.out.println("Player Data retrieved");
             System.out.println(playerData.getUsername());
             Response response;
             if(playerData != null)
                 response = new Response(Response.Status.SUCCESS, playerData);
             else
-                response = new Response(Response.Status.FAILURE,new PlayerDTO("Test", 4, true));
+                response = new Response(Response.Status.FAILURE,"Failed Registeration");
             output.writeObject(response);
             output.flush();
         } catch (SQLException ex) {

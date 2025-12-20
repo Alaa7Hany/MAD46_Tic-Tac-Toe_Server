@@ -55,7 +55,7 @@ public class DatabaseHandler {
 
         String sql =
         "INSERT INTO USERS (NAME, password, score, STATUS) " +
-        "VALUES (?, ?, 0, true)";
+        "VALUES (?, ?, 0, 1)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
