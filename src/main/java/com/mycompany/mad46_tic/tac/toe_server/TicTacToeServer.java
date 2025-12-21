@@ -20,6 +20,7 @@ public class TicTacToeServer {
     private ServerSocket serverSocket;
     public static Vector<ClientHandler> clients = new Vector<>();
     public static boolean isRunning;
+    public static int connectionCount = 0;
 
     public TicTacToeServer() {}
     
@@ -30,18 +31,23 @@ public class TicTacToeServer {
             System.out.println("Server Started, waiting for connections...");
             
             // FOR TEST ONLY: add 2 fake clients
-            addTestClients();
+            //addTestClients();
 
             while (isRunning) {
                 try {
                     // This line blocks until a client connects
                     Socket socket = serverSocket.accept();
                     System.out.println("New Client Connected!");
-
+                    
+                    
                     ClientHandler handler = new ClientHandler(socket);
+                    connectionCount++;
+                    if (connectionCount == 1) handler.setUsername("Emad");
+                    else if (connectionCount == 2) handler.setUsername("Hema");
+                    //ClientHandler handler = new ClientHandler(socket);
                     clients.add(handler);
                     handler.start();
-                    
+
                 } catch (SocketException e) {
                     // This exception happens when we close the socket to stop the server
                     if (!isRunning) {
@@ -58,28 +64,28 @@ public class TicTacToeServer {
     }
     
      //  TEST ONLY Dont try it at home **** this works fine 
-    private void addTestClients() {
+    /*private void addTestClients() {
         
         //  client 1
         ClientHandler player1 = new ClientHandler(null) {
             @Override
             public void run() {}
         };
-        player1.setUsername("player1");
+        player1.setUsername("Emad");
 
         // fake client 2
         ClientHandler player2 = new ClientHandler(null) {
             @Override
             public void run() {}
         };
-        player2.setUsername("player2");
+        player2.setUsername("Hema");
 
         clients.add(player1);
         clients.add(player2);
 
-        System.out.println(" added: player1, player2");
+        System.out.println(" added: Emad, Hema");
         
-    }
+    }*/
         
     public void stopServer() {
         isRunning = false;
