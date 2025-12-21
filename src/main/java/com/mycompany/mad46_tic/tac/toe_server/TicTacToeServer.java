@@ -7,6 +7,7 @@ package com.mycompany.mad46_tic.tac.toe_server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Vector;
 
 /**
@@ -18,26 +19,39 @@ public class TicTacToeServer {
 
     private ServerSocket serverSocket;
     public static Vector<ClientHandler> clients = new Vector<>();
-    
-    public TicTacToeServer() {
+    public static boolean isRunning;
 
+    public TicTacToeServer() {}
+    
+    public void startServer() {
         try {
             serverSocket = new ServerSocket(5005);
+            isRunning = true;
             System.out.println("Server Started, waiting for connections...");
             
             // FOR TEST ONLY: add 2 fake clients
             addTestClients();
 
-            while (true) {
+            while (isRunning) {
+                try {
+                    // This line blocks until a client connects
+                    Socket socket = serverSocket.accept();
+                    System.out.println("New Client Connected!");
 
-                Socket socket = serverSocket.accept();
-                System.out.println("New Client Connected!");
-                
-                ClientHandler handler = new ClientHandler(socket);
-                clients.add(handler);
-                handler.start();
+                    ClientHandler handler = new ClientHandler(socket);
+                    clients.add(handler);
+                    handler.start();
+                    
+                } catch (SocketException e) {
+                    // This exception happens when we close the socket to stop the server
+                    if (!isRunning) {
+                        System.out.println("Server Stopped Manually");
+                        break; 
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
             }
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -64,6 +78,28 @@ public class TicTacToeServer {
         clients.add(player2);
 
         System.out.println(" added: player1, player2");
+        
+    }
+        
+    public void stopServer() {
+        isRunning = false;
+        try {
+            // Stop accepting new connections
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            clearClients();
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public static void clearClients(){
+        for (ClientHandler client : clients) {
+            client.closeConnection();
+        }
+        clients.clear();
     }
 
 
