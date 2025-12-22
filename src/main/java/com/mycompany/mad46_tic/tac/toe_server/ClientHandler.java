@@ -9,6 +9,7 @@ import com.mycompany.tictactoeshared.InvitationDTO;
 import com.mycompany.tictactoeshared.LoginDTO;
 import com.mycompany.tictactoeshared.PlayerDTO;
 import com.mycompany.tictactoeshared.Request;
+import com.mycompany.tictactoeshared.RequestType;
 import com.mycompany.tictactoeshared.Response;
 import com.mycompany.tictactoeshared.Response.Status;
 import java.io.IOException;
@@ -141,8 +142,8 @@ public class ClientHandler extends Thread {
             if (invite.getToUsername().equals(client.getUsername())) {
                  System.out.println("Found target client: " + client.getUsername());
                 try {
-                    Response response = new Response(Response.Status.SUCCESS,invite);
-                    client.output.writeObject(response);
+                    Request push =new Request(RequestType.INVITE_RECEIVED, invite);
+                    client.output.writeObject(push);
                     client.output.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -170,7 +171,8 @@ public class ClientHandler extends Thread {
 
         if (sender != null && receiver != null) {
             try {
-                Response startGame = new Response(Response.Status.SUCCESS, "START_GAME");
+                //edit : send  request... type invitatin accept 
+                Request startGame = new Request(RequestType.START_GAME, invite);
 
                 sender.output.writeObject(startGame);
                 sender.output.flush();
@@ -191,7 +193,8 @@ public class ClientHandler extends Thread {
         for (ClientHandler client : TicTacToeServer.clients) {
             if (from.equals(client.getUsername())) {
                 try {
-                    Response rejected = new Response(Response.Status.SUCCESS, "INVITE_REJECTED");
+                    //edit : send  request... type invitatin reject 
+                    Request rejected = new Request(RequestType.INVITE_REJECTED, invite);
                     client.output.writeObject(rejected);
                     client.output.flush();
                 } catch (IOException e) {

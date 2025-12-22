@@ -29,10 +29,7 @@ public class TicTacToeServer {
             serverSocket = new ServerSocket(5005);
             isRunning = true;
             System.out.println("Server Started, waiting for connections...");
-            
-            // FOR TEST ONLY: add 2 fake clients
-            //addTestClients();
-
+ 
             while (isRunning) {
                 try {
                     // This line blocks until a client connects
@@ -62,31 +59,7 @@ public class TicTacToeServer {
             ex.printStackTrace();
         }
     }
-    
-     //  TEST ONLY Dont try it at home **** this works fine 
-    /*private void addTestClients() {
-        
-        //  client 1
-        ClientHandler player1 = new ClientHandler(null) {
-            @Override
-            public void run() {}
-        };
-        player1.setUsername("Emad");
-
-        // fake client 2
-        ClientHandler player2 = new ClientHandler(null) {
-            @Override
-            public void run() {}
-        };
-        player2.setUsername("Hema");
-
-        clients.add(player1);
-        clients.add(player2);
-
-        System.out.println(" added: Emad, Hema");
-        
-    }*/
-        
+       
     public void stopServer() {
         isRunning = false;
         try {
