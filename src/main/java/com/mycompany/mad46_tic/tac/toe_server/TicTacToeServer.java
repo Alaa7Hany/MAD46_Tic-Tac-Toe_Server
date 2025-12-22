@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -19,6 +20,7 @@ public class TicTacToeServer {
 
     private ServerSocket serverSocket;
     public static Vector<ClientHandler> clients = new Vector<>();
+    public static HashMap<String, GameSession> sessions = new HashMap<>();
     public static boolean isRunning;
     public static int connectionCount = 0;
 
