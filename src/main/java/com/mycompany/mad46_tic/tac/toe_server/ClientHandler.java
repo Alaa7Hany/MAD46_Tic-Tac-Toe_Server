@@ -55,9 +55,9 @@ public class ClientHandler extends Thread {
 
         try {
             // to test only will send based on invtion data 
-            if (TicTacToeServer.clients.size() >= 2) {
-                startGameForTesting();
-            }
+           // if (TicTacToeServer.clients.size() >= 2) {
+            //    startGameForTesting();
+            //}
             while (true) {
 
                 Request received = (Request) input.readObject();
@@ -152,6 +152,10 @@ public class ClientHandler extends Thread {
                     Request push =new Request(RequestType.INVITE_RECEIVED, invite);
                     client.output.writeObject(push);
                     client.output.flush();
+                    
+                    Response response = new Response(Response.Status.SUCCESS, "Invite sent");
+                    this.output.writeObject(response);
+                    this.output.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -163,7 +167,7 @@ public class ClientHandler extends Thread {
 
     }
     
-    private void handleAcceptInvite(InvitationDTO invite) { 
+    private void handleAcceptInvite(InvitationDTO invite) { // return 2 client handler 
 
         String from = invite.getFromUsername(); 
         String to   = invite.getToUsername();   
@@ -177,14 +181,25 @@ public class ClientHandler extends Thread {
         }
 
         if (sender != null && receiver != null) {
+            
+            String sessionID = UUID.randomUUID().toString();
+            GameSession session = new GameSession(sessionID, sender, receiver);
+            TicTacToeServer.sessions.put(sessionID, session);
+            
             try {
                 //edit : send  request... type invitatin accept 
-                Request startGame = new Request(RequestType.START_GAME, invite);
-
-                sender.output.writeObject(startGame);
+                Request startX = new Request(RequestType.START_GAME,new StartGameDTO(sessionID, "X"));
+                sender.output.writeObject(startX);
                 sender.output.flush();
 
-                receiver.output.writeObject(startGame);
+                Response acceptResponse = new Response(Response.Status.SUCCESS, "Game started");
+                sender.output.writeObject(acceptResponse); 
+                sender.output.flush();
+                receiver.output.writeObject(acceptResponse); 
+                receiver.output.flush();
+                
+                Request startO = new Request(RequestType.START_GAME,new StartGameDTO(sessionID, "O"));
+                receiver.output.writeObject(startO);
                 receiver.output.flush();
 
                 System.out.println("Game starting: " + from + " vs " + to);
