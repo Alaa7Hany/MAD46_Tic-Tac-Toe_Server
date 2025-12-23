@@ -1,0 +1,94 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Dec 16, 2025, 12:26:13 AM
+    Author     : siam
+*/
+
+.background {
+    -fx-background-color:  linear-gradient(
+        to bottom,
+        #4426A9,
+        #3a1d7a
+    );
+    -fx-border-color:  #D7EA91;
+    -fx-border-width: 2;
+}
+
+.serverContainers {
+    -fx-background-color:  #24124e;
+    -fx-border-color:  #D7EA91;
+    -fx-border-width: 2;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 5;
+}
+
+.button {
+    -fx-background-color: #1d1242;
+    -fx-background-radius: 20;
+    -fx-border-color: #D7EA91;
+    -fx-border-radius: 20;
+    -fx-border-width: 2;
+
+}
+
+.default-color0.chart-pie {
+    -fx-pie-color: #2ecc71;
+}
+.default-color1.chart-pie {
+    -fx-pie-color: #95a5a6;
+}
+.chart-pie {
+    -fx-border-color: transparent;
+}
+
+.x-label {
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
+    -fx-font-size: 50px;
+}
+
+.o-label {
+    -fx-text-fill: #d7ea91;
+    -fx-font-weight: bold;
+    -fx-font-size: 50px;
+}
+
+
+.custom-scroll {
+    -fx-background-color: transparent;
+}
+
+.custom-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.custom-scroll .scroll-bar:vertical {
+    -fx-opacity: 0;
+    -fx-pref-width: 6;
+}
+
+.custom-scroll:hover .scroll-bar:vertical {
+    -fx-opacity: 1;
+}
+
+.custom-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(58, 29, 122,0.7);
+    -fx-background-radius: 10;
+}
+
+.custom-scroll .increment-button,
+.custom-scroll .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.textInput {
+    -fx-text-fill: #D7EA91;
+    -fx-prompt-text-fill: #B3ACCA;
+    -fx-font-weight: bold;
+}
+

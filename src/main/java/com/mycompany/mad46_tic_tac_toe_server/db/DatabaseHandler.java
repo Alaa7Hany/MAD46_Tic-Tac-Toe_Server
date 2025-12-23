@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -25,9 +27,9 @@ public class DatabaseHandler {
     public PlayerDTO login(LoginDTO loginDTO) {
 
         String sql =
-        "SELECT NAME, score, STATUS " +
+        "SELECT NAME, SCORE, STATUS " +
         "FROM USERS " +
-        "WHERE NAME=? AND password=?";
+        "WHERE NAME=? AND PASSWORD=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -39,7 +41,7 @@ public class DatabaseHandler {
             if (rs.next()) {
                 return new PlayerDTO(
                         rs.getString("NAME"),
-                        rs.getInt("score"),
+                        rs.getInt("SCORE"),
                         rs.getBoolean("STATUS")
                 );
             }
@@ -55,7 +57,7 @@ public class DatabaseHandler {
 
         String sql =
         "INSERT INTO USERS (NAME, password, score, STATUS) " +
-        "VALUES (?, ?, 0, true)";
+        "VALUES (?, ?, 0, 1)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -73,6 +75,69 @@ public class DatabaseHandler {
             e.printStackTrace();
             return null;
         }
+    }
+    
+
+    //for lobby
+    public List<PlayerDTO> getOnlinePlayersForLobby() {
+
+        List<PlayerDTO> players = new ArrayList<>();
+
+        String sql =
+            "SELECT NAME, SCORE, STATUS " +
+            "FROM USERS " +
+            "WHERE STATUS = 1";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                players.add(
+                    new PlayerDTO(
+                        rs.getString("NAME"),
+                        rs.getInt("SCORE"),
+                        rs.getBoolean("STATUS")
+                    )
+                );
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return players;
+    }
+    
+    public int getOnlinePlayers() {
+        int onlineNum = 0;
+        
+        String sql = "SELECT COUNT(*) FROM USERS WHERE STATUS = 1"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                onlineNum = rs.getInt(1); 
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return onlineNum;
+    }
+    
+    public int getTotalPlayers() {
+        int offlineNum = 0;
+        String sql = "SELECT COUNT(*) FROM USERS"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                offlineNum = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return offlineNum;
     }
     
 }
