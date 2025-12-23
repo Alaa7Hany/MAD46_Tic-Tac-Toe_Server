@@ -86,7 +86,7 @@ public class DatabaseHandler {
         String sql =
             "SELECT NAME, SCORE, STATUS " +
             "FROM USERS " +
-            "WHERE STATUS = true";
+            "WHERE STATUS = 1";
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -111,7 +111,7 @@ public class DatabaseHandler {
     public int getOnlinePlayers() {
         int onlineNum = 0;
         
-        String sql = "SELECT COUNT(*) FROM USERS WHERE STATUS = TRUE"; 
+        String sql = "SELECT COUNT(*) FROM USERS WHERE STATUS = 1"; 
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();

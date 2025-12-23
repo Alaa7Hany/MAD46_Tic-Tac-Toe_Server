@@ -37,13 +37,9 @@ public class TicTacToeServer {
                     // This line blocks until a client connects
                     Socket socket = serverSocket.accept();
                     System.out.println("New Client Connected!");
-                    
+
                     
                     ClientHandler handler = new ClientHandler(socket);
-                    connectionCount++;
-                    if (connectionCount == 1) handler.setUsername("Emad");
-                    else if (connectionCount == 2) handler.setUsername("Hema");
-                    //ClientHandler handler = new ClientHandler(socket);
                     clients.add(handler);
                     handler.start();
 

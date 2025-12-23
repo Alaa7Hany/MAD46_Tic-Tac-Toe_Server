@@ -104,6 +104,7 @@ public class ClientHandler extends Thread {
             PlayerDTO playerData = new DatabaseHandler().login(loginData);
             Response response;
             if (playerData != null) {
+                this.username = playerData.getUsername();
                 response = new Response(Response.Status.SUCCESS, playerData);
             } else {
                 response = new Response(Response.Status.FAILURE, "Failed to login");
@@ -143,34 +144,49 @@ public class ClientHandler extends Thread {
     
     
     private void handleInvite(InvitationDTO invite) {
+        System.out.println("server side handle invite");
+        System.out.println("Invite: from " + invite.getFromUsername().getUsername() + " to " + invite.getToUsername().getUsername());
 
+        ClientHandler receiver = null;
+        System.out.println("Clients count: " + TicTacToeServer.clients.size());
         for (ClientHandler client : TicTacToeServer.clients) {
-            System.out.println("checking client: " + client.getUsername());
-            if (invite.getToUsername().equals(client.getUsername())) {
-                 System.out.println("Found target client: " + client.getUsername());
-                try {
-                    Request push =new Request(RequestType.INVITE_RECEIVED, invite);
-                    client.output.writeObject(push);
-                    client.output.flush();
-                    
-                    Response response = new Response(Response.Status.SUCCESS, "Invite sent");
-                    this.output.writeObject(response);
-                    this.output.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return;
+            System.out.println("  Checking client: '" + client.getUsername() + "' (null=" + (client.getUsername() == null) + ")");
+            if (client.getUsername() != null && 
+                invite.getToUsername().getUsername().equals(client.getUsername())) {
+                receiver = client;
+                System.out.println(" MATCH FOUND: " + receiver.getUsername());
+                break;
             }
         }
-        
-        System.out.println("not found");
 
+        if (receiver != null) {
+            try {
+                System.out.println(" Sending INVITE_RECEIVED to " + receiver.getUsername());
+                Request push = new Request(RequestType.INVITE_RECEIVED, invite);
+                receiver.output.writeObject(push);
+                receiver.output.flush();
+
+                Response response = new Response(Response.Status.SUCCESS, "Invite sent");
+                this.output.writeObject(response);
+                this.output.flush();
+                System.out.println("Invite flow COMPLETE");
+            } catch (IOException e) {
+                System.out.println(" Send error: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("NO RECEIVER - DUMPING ALL CLIENTS:");
+            for (ClientHandler client : TicTacToeServer.clients) {
+                System.out.println("  Client object: " + client);
+                System.out.println("  Client username: '" + client.getUsername() + "'");
+            }
+        }
     }
     
     private void handleAcceptInvite(InvitationDTO invite) { // return 2 client handler 
 
-        String from = invite.getFromUsername(); 
-        String to   = invite.getToUsername();   
+        String from = invite.getFromUsername().getUsername(); 
+        String to   = invite.getToUsername().getUsername();   
 
         ClientHandler sender = null;
         ClientHandler receiver = null;
@@ -195,11 +211,12 @@ public class ClientHandler extends Thread {
                 Response acceptResponse = new Response(Response.Status.SUCCESS, "Game started");
                 sender.output.writeObject(acceptResponse); 
                 sender.output.flush();
-                receiver.output.writeObject(acceptResponse); 
-                receiver.output.flush();
                 
                 Request startO = new Request(RequestType.START_GAME,new StartGameDTO(sessionID, "O"));
                 receiver.output.writeObject(startO);
+                receiver.output.flush();
+                
+                receiver.output.writeObject(acceptResponse); 
                 receiver.output.flush();
 
                 System.out.println("Game starting: " + from + " vs " + to);
@@ -210,7 +227,7 @@ public class ClientHandler extends Thread {
     }
     
     private void handleRejectInvite(InvitationDTO invite) { 
-        String from = invite.getFromUsername(); 
+        String from = invite.getFromUsername().getUsername(); 
 
         for (ClientHandler client : TicTacToeServer.clients) {
             if (from.equals(client.getUsername())) {
