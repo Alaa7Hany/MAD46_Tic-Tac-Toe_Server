@@ -10,7 +10,6 @@ import com.mycompany.tictactoeshared.MoveDTO;
 import com.mycompany.tictactoeshared.PlayerDTO;
 import com.mycompany.tictactoeshared.Request;
 import com.mycompany.tictactoeshared.RequestType;
-import static com.mycompany.tictactoeshared.RequestType.MOVE;
 import com.mycompany.tictactoeshared.Response;
 import com.mycompany.tictactoeshared.StartGameDTO;
 import java.io.IOException;
@@ -60,6 +59,7 @@ public class ClientHandler extends Thread {
                         login((LoginDTO) received.getData());
                         break;
                     case GET_ONLINE_PLAYERS:
+                        System.out.println("##################I'm hereeeeeeeeeeeeeeeee");
                         getOnlinePlayersForLobby();
                         break;
                     case REGISTER:
@@ -124,6 +124,7 @@ public class ClientHandler extends Thread {
         try {
             List<PlayerDTO> players
                     = new DatabaseHandler().getOnlinePlayersForLobby();
+            System.out.println("##################Number of players: "+players.size());
 
             Response response
                     = new Response(Response.Status.SUCCESS, players);
