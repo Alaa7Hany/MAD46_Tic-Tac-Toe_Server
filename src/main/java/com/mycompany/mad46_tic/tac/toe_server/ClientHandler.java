@@ -55,10 +55,6 @@ public class ClientHandler extends Thread {
     public void run() {
 
         try {
-            // to test only will send based on invtion data 
-           // if (TicTacToeServer.clients.size() >= 2) {
-            //    startGameForTesting();
-            //}
             while (true) {
 
                 Request received = (Request) input.readObject();
@@ -200,31 +196,7 @@ public class ClientHandler extends Thread {
 
         if (sender != null && receiver != null) {
             
-            String sessionID = UUID.randomUUID().toString();
-            GameSession session = new GameSession(sessionID, sender, receiver);
-            TicTacToeServer.sessions.put(sessionID, session);
-            
-            try {
-                //edit : send  request... type invitatin accept 
-                Request startX = new Request(RequestType.START_GAME,new StartGameDTO(sessionID, "X"));
-                sender.output.writeObject(startX);
-                sender.output.flush();
-
-                Response acceptResponse = new Response(Response.Status.SUCCESS, "Game started");
-                sender.output.writeObject(acceptResponse); 
-                sender.output.flush();
-                
-                Request startO = new Request(RequestType.START_GAME,new StartGameDTO(sessionID, "O"));
-                receiver.output.writeObject(startO);
-                receiver.output.flush();
-                
-                receiver.output.writeObject(acceptResponse); 
-                receiver.output.flush();
-
-                System.out.println("Game starting: " + from + " vs " + to);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+          startGameInOnlineMode(sender,receiver);
         }
     }
     
@@ -267,10 +239,8 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private void startGameForTesting() {
-        ClientHandler p1 = TicTacToeServer.clients.get(0);
-        ClientHandler p2 = TicTacToeServer.clients.get(1);
-
+    private void startGameInOnlineMode( ClientHandler p1, ClientHandler p2 ) {
+       
         String sessionID = UUID.randomUUID().toString();
 
         GameSession session = new GameSession(sessionID, p1, p2);
