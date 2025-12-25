@@ -196,7 +196,7 @@ public class ClientHandler extends Thread {
         }
     }
     
-    private void handleAcceptInvite(InvitationDTO invite) { // return 2 client handler 
+    private void handleAcceptInvite(InvitationDTO invite) throws IOException { // return 2 client handler 
 
         String from = invite.getFromUsername().getUsername(); 
         String to   = invite.getToUsername().getUsername();   
@@ -210,7 +210,9 @@ public class ClientHandler extends Thread {
         }
 
         if (sender != null && receiver != null) {
-            
+           Request r = new Request(RequestType.ACCEPT_INVITE, null);
+           sender.output.writeObject(r);
+            receiver.output.writeObject(r);
           startGameInOnlineMode(sender,receiver);
         }
     }
