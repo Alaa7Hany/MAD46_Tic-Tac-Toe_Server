@@ -22,8 +22,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Vector;
 
 /**
  *
@@ -34,7 +36,8 @@ public class ClientHandler extends Thread {
     private Socket socket;
     private ObjectInputStream input;
     private ObjectOutputStream output;
-    private String username; 
+//    private String username; 
+    private PlayerDTO currentPlayer;
    
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -98,6 +101,7 @@ public class ClientHandler extends Thread {
         } finally {
             TicTacToeServer.clients.remove(this);
             closeConnection();
+            TicTacToeServer.broadCastPlayerList();
         }
     }
 
@@ -106,13 +110,15 @@ public class ClientHandler extends Thread {
             PlayerDTO playerData = new DatabaseHandler().login(loginData);
             Response response;
             if (playerData != null) {
-                this.username = playerData.getUsername();
+                this.currentPlayer = playerData;
+//                this.username = playerData.getUsername();
                 response = new Response(Response.Status.SUCCESS, playerData);
             } else {
                 response = new Response(Response.Status.FAILURE, "Failed to login");
             }
             output.writeObject(response);
             output.flush();
+            TicTacToeServer.broadCastPlayerList();
         } catch (SQLException ex) {
             System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         } catch (IOException ex) {
@@ -123,6 +129,7 @@ public class ClientHandler extends Thread {
     private void register(LoginDTO loginData) {
         try {
             PlayerDTO playerData = new DatabaseHandler().register(loginData);
+            this.currentPlayer = playerData;
             System.out.println("Player Data retrieved");
             System.out.println(playerData.getUsername());
             Response response;
@@ -141,8 +148,14 @@ public class ClientHandler extends Thread {
         }
     }
     
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() { return currentPlayer.getUsername(); }
+    public PlayerDTO getPlayer(){
+        return currentPlayer;
+    }
+    public ObjectOutputStream getOutput(){
+        return output;
+    }
+//    public void setUsername(String username) { this.currentPlayer = username; }
     
     
     private void handleInvite(InvitationDTO invite) {
@@ -252,8 +265,19 @@ public class ClientHandler extends Thread {
     private void getOnlinePlayersForLobby() {
 
         try {
-            List<PlayerDTO> players
-                    = new DatabaseHandler().getOnlinePlayersForLobby();
+//            List<PlayerDTO> initialPlayers
+//                    = new DatabaseHandler().getOnlinePlayersForLobby();
+            
+            Vector<ClientHandler> currentClients = new Vector<>(TicTacToeServer.clients);
+
+            List<PlayerDTO> players = new ArrayList<>();
+            for(ClientHandler client : currentClients){
+                if (client.currentPlayer != null) {
+                    players.add(client.currentPlayer);
+                }
+            }
+            
+            
             System.out.println("##################Number of players: "+players.size());
 
             Response response
@@ -262,7 +286,7 @@ public class ClientHandler extends Thread {
             output.writeObject(response);
             output.flush();
 
-        } catch (SQLException | IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }

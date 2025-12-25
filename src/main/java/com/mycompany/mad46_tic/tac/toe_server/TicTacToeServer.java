@@ -4,11 +4,17 @@
  */
 package com.mycompany.mad46_tic.tac.toe_server;
 
+import com.mycompany.tictactoeshared.PlayerDTO;
+import com.mycompany.tictactoeshared.Request;
+import com.mycompany.tictactoeshared.RequestType;
+import com.mycompany.tictactoeshared.Response;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -56,6 +62,30 @@ public class TicTacToeServer {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+    
+    public static void broadCastPlayerList(){
+        List<PlayerDTO> players = new ArrayList<>();
+        Vector<ClientHandler> currentClients = new Vector<>(clients);
+        
+        for(ClientHandler client : currentClients){
+            if (client.getUsername() != null) { 
+                players.add(client.getPlayer());
+            }
+        }
+        
+        Request request = new Request(RequestType.GET_ONLINE_PLAYERS, players);
+        for(ClientHandler client : currentClients){
+            try{
+                if(client.getUsername() != null){
+                    client.getOutput().writeObject(request);
+                    client.getOutput().flush();
+                }
+            }catch(IOException e){
+                System.out.println("Failed to broadcast to " + client.getUsername());
+            }
+        }
+    
     }
        
     public void stopServer() {
