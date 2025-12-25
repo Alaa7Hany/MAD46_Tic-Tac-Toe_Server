@@ -44,6 +44,8 @@ public class PrimaryController implements Initializable {
     private DatabaseHandler dbh;
     
     private TicTacToeServer server;
+    
+    private Thread updateThread;
 
     /**
      * Initializes the controller class.
@@ -62,10 +64,14 @@ public class PrimaryController implements Initializable {
         } catch (SQLException ex) {
             System.getLogger(PrimaryController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
+        
 
     }
     
     private void initData(){
+        onlineNum = TicTacToeServer.clients.size();
+        offlineNum = dbh.getTotalPlayers() - onlineNum;
+        
         totalUsersLbl.setText(Integer.toString(onlineNum+offlineNum));
         onlineUsersLbl.setText(Integer.toString(onlineNum));
         offlineUsersLbl.setText(Integer.toString(offlineNum));
@@ -108,10 +114,10 @@ public class PrimaryController implements Initializable {
         });
     }
 
-    public void updateData(int onlineUsers, int offlineUsers) {
+    public void updateData() {
         
-        onlineNum = onlineUsers;
-        offlineNum = offlineUsers;
+        onlineNum = TicTacToeServer.clients.size();
+        offlineNum = dbh.getTotalPlayers() - onlineNum;
         
         Platform.runLater(()->{
             onlineSlice.setPieValue(onlineNum);
@@ -121,6 +127,7 @@ public class PrimaryController implements Initializable {
             offlineUsersLbl.setText(String.valueOf(offlineNum));
             totalUsersLbl.setText(String.valueOf(onlineNum + offlineNum));
         });
+        System.out.println(">>>>>>>>>>>>>>>>>>>> Data updated");
     }
 
     @FXML
@@ -134,15 +141,31 @@ public class PrimaryController implements Initializable {
             serverThread.setDaemon(true); 
             serverThread.start();
             
-            onlineNum = dbh.getOnlinePlayers(); 
-            offlineNum = dbh.getTotalPlayers() - onlineNum;
-            Platform.runLater(() -> initData());
-            try {
-                Image onlineImg = new Image(getClass().getResourceAsStream("/images/online_icon.png"));
-                offOnImage.setImage(onlineImg);
-            } catch (Exception e) {
-                System.out.println("Error loading online image: " + e.getMessage());
-            }
+            Platform.runLater(() -> {
+                initData();
+                try {
+                    Image onlineImg = new Image(getClass().getResourceAsStream("/images/online_icon.png"));
+                    offOnImage.setImage(onlineImg);
+                } catch (Exception e) {
+                    System.out.println("Error loading online image: " + e.getMessage());
+                }
+            });
+            
+            updateThread = new Thread(() -> {
+                // keep running until interrupted
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        Thread.sleep(5000);
+                        updateData(); 
+                    } catch (InterruptedException ex) {
+                        System.out.println("Update thread stopped!");
+                        break; 
+                    }
+                }
+            });
+            
+            updateThread.setDaemon(true);
+            updateThread.start();
         }
     }
 
@@ -153,8 +176,11 @@ public class PrimaryController implements Initializable {
                server.stopServer();
             }
             
+            if (updateThread != null && updateThread.isAlive()) {
+                updateThread.interrupt(); 
+            }               
             resetUI();
-           
+            
             try {
                 Image offlineImg = new Image(getClass().getResourceAsStream("/images/offline_icon.png"));
                 offOnImage.setImage(offlineImg);

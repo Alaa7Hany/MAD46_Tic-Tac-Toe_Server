@@ -56,13 +56,15 @@ public class DatabaseHandler {
     public PlayerDTO register(LoginDTO loginDTO) {
 
         String sql =
-        "INSERT INTO USERS (NAME, password, score, STATUS) " +
-        "VALUES (?, ?, 0, 1)";
+        "INSERT INTO USERS (ID ,NAME, password, score, STATUS) " +
+        "VALUES (?,?, ?, 0, 1)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, loginDTO.getUsername());
-            ps.setString(2, loginDTO.getPassword());
+            
+            
+            ps.setInt(1, getTotalPlayers()+1);
+            ps.setString(2, loginDTO.getUsername());
+            ps.setString(3, loginDTO.getPassword());
             ps.executeUpdate();
 
             return new PlayerDTO(
