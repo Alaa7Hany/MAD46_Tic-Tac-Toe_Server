@@ -22,7 +22,8 @@ public class TicTacToeServer {
     public static Vector<ClientHandler> clients = new Vector<>();
     public static HashMap<String, GameSession> sessions = new HashMap<>();
     public static boolean isRunning;
-    
+    public static int connectionCount = 0;
+
     public TicTacToeServer() {}
     
     public void startServer() {
@@ -30,17 +31,18 @@ public class TicTacToeServer {
             serverSocket = new ServerSocket(5005);
             isRunning = true;
             System.out.println("Server Started, waiting for connections...");
-
+ 
             while (isRunning) {
                 try {
                     // This line blocks until a client connects
                     Socket socket = serverSocket.accept();
                     System.out.println("New Client Connected!");
 
+                    
                     ClientHandler handler = new ClientHandler(socket);
                     clients.add(handler);
                     handler.start();
-                    
+
                 } catch (SocketException e) {
                     // This exception happens when we close the socket to stop the server
                     if (!isRunning) {
@@ -55,7 +57,7 @@ public class TicTacToeServer {
             ex.printStackTrace();
         }
     }
-    
+       
     public void stopServer() {
         isRunning = false;
         try {
