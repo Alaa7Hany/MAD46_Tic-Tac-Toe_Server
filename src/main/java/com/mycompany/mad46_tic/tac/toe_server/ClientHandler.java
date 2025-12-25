@@ -125,18 +125,20 @@ public class ClientHandler extends Thread {
     private void register(LoginDTO loginData) {
         try {
             PlayerDTO playerData = new DatabaseHandler().register(loginData);
-            this.currentPlayer = playerData;
+            
             System.out.println("Player Data retrieved");
             System.out.println(playerData.getUsername());
             Response response;
 
             if (playerData != null) {
                 response = new Response(Response.Status.SUCCESS, playerData);
+                this.currentPlayer = playerData;
             } else {
                 response = new Response(Response.Status.FAILURE, "Failed Registeration");
             }
             output.writeObject(response);
             output.flush();
+            TicTacToeServer.broadCastPlayerList();
         } catch (SQLException ex) {
             System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         } catch (IOException ex) {
