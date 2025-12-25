@@ -5,6 +5,7 @@
 package com.mycompany.mad46_tic.tac.toe_server;
 
 import com.mycompany.mad46_tic_tac_toe_server.db.DatabaseHandler;
+import com.mycompany.mad46_tic_tac_toe_server.db.UserAuthException;
 import com.mycompany.tictactoeshared.InvitationDTO;
 import com.mycompany.tictactoeshared.LoginDTO;
 import com.mycompany.tictactoeshared.MoveDTO;
@@ -12,8 +13,6 @@ import com.mycompany.tictactoeshared.PlayerDTO;
 import com.mycompany.tictactoeshared.Request;
 import com.mycompany.tictactoeshared.RequestType;
 
-import com.mycompany.tictactoeshared.Response;
-import com.mycompany.tictactoeshared.Response.Status;
 import static com.mycompany.tictactoeshared.RequestType.MOVE;
 import com.mycompany.tictactoeshared.Response;
 import com.mycompany.tictactoeshared.StartGameDTO;
@@ -102,47 +101,58 @@ public class ClientHandler extends Thread {
     }
 
     private void login(LoginDTO loginData) {
+        Response response;
         try {
             PlayerDTO playerData = new DatabaseHandler().login(loginData);
-            Response response;
-            if (playerData != null) {
-                this.currentPlayer = playerData;
-//                this.username = playerData.getUsername();
-                response = new Response(Response.Status.SUCCESS, playerData);
-            } else {
-                response = new Response(Response.Status.FAILURE, "Failed to login");
-            }
-            output.writeObject(response);
-            output.flush();
-            TicTacToeServer.broadCastPlayerList();
+            this.currentPlayer = playerData;
+            response = new Response(Response.Status.SUCCESS, playerData);
+            
+            
+        }catch (UserAuthException ex){
+            response = new Response(Response.Status.FAILURE, ex.getMessage());
         } catch (SQLException ex) {
             System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        } catch (IOException ex) {
-            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            response = new Response(Response.Status.FAILURE, "Something went wrong");
+        }
+        
+        try {
+            output.writeObject(response);
+            output.flush();
+            if(response.getStatus() == Response.Status.SUCCESS){
+                // add the client only if they manages to login
+                TicTacToeServer.clients.add(this);
+                TicTacToeServer.broadCastPlayerList();
+            }
+        } catch (Exception e) {
         }
     }
 
     private void register(LoginDTO loginData) {
+        Response response;
         try {
             PlayerDTO playerData = new DatabaseHandler().register(loginData);
             
             System.out.println("Player Data retrieved");
             System.out.println(playerData.getUsername());
-            Response response;
 
-            if (playerData != null) {
-                response = new Response(Response.Status.SUCCESS, playerData);
-                this.currentPlayer = playerData;
-            } else {
-                response = new Response(Response.Status.FAILURE, "Failed Registeration");
-            }
+            response = new Response(Response.Status.SUCCESS, playerData);
+            this.currentPlayer = playerData;
+        }catch (UserAuthException ex){
+            response = new Response(Response.Status.FAILURE, ex.getMessage());
+        }catch (SQLException ex) {
+            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            response = new Response(Response.Status.FAILURE, "Something went wrong");
+
+        }
+        
+        try {
             output.writeObject(response);
             output.flush();
-            TicTacToeServer.broadCastPlayerList();
-        } catch (SQLException ex) {
-            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        } catch (IOException ex) {
-            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            if(response.getStatus() == Response.Status.SUCCESS){
+                TicTacToeServer.clients.add(this);
+                TicTacToeServer.broadCastPlayerList();
+            }
+        } catch (Exception e) {
         }
     }
     

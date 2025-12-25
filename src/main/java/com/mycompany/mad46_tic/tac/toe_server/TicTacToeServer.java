@@ -46,7 +46,7 @@ public class TicTacToeServer {
 
                     
                     ClientHandler handler = new ClientHandler(socket);
-                    clients.add(handler);
+//                    clients.add(handler);
                     handler.start();
 
                 } catch (SocketException e) {
