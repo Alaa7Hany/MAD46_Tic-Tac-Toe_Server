@@ -86,6 +86,10 @@ public class ClientHandler extends Thread {
                         break;
                     case MOVE:
                         handleMove((MoveDTO) received.getData());
+                        break;
+                    case LOGOUT:
+                        handleLogout(); 
+                        break;
                     default:
                         break;
                 }
@@ -333,6 +337,13 @@ public class ClientHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void handleLogout(){
+        System.out.println(currentPlayer.getUsername()+"logout");
+        TicTacToeServer.clients.remove(this);
+        TicTacToeServer.broadCastPlayerList();
+        closeConnection();
     }
 
     public void closeConnection() {
