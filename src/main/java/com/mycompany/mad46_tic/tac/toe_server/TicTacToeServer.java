@@ -67,14 +67,15 @@ public class TicTacToeServer {
     public static void broadCastPlayerList(){
         List<PlayerDTO> players = new ArrayList<>();
         Vector<ClientHandler> currentClients = new Vector<>(clients);
-        
+
         for(ClientHandler client : currentClients){
             if (client.getUsername() != null) { 
                 players.add(client.getPlayer());
             }
         }
-        
+
         Request request = new Request(RequestType.GET_ONLINE_PLAYERS, players);
+
         for(ClientHandler client : currentClients){
             try{
                 if(client.getUsername() != null){
@@ -85,7 +86,6 @@ public class TicTacToeServer {
                 System.out.println("Failed to broadcast to " + client.getUsername());
             }
         }
-    
     }
        
     public void stopServer() {
