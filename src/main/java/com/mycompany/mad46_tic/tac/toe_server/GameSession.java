@@ -12,10 +12,13 @@ public class GameSession {
     public String sessionID;
     public ClientHandler playerX;
     public ClientHandler playerO;
+    boolean xRematch = false;
+    boolean oRematch = false;
 
     public GameSession(String id, ClientHandler x, ClientHandler o){
         this.sessionID = id;
         this.playerX = x;
         this.playerO = o;
     }
+ 
 }

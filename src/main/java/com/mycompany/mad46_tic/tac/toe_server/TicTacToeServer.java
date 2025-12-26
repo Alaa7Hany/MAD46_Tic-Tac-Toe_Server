@@ -7,7 +7,6 @@ package com.mycompany.mad46_tic.tac.toe_server;
 import com.mycompany.tictactoeshared.PlayerDTO;
 import com.mycompany.tictactoeshared.Request;
 import com.mycompany.tictactoeshared.RequestType;
-import com.mycompany.tictactoeshared.Response;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
