@@ -16,6 +16,7 @@ import com.mycompany.tictactoeshared.RequestType;
 import static com.mycompany.tictactoeshared.RequestType.MOVE;
 import com.mycompany.tictactoeshared.Response;
 import com.mycompany.tictactoeshared.StartGameDTO;
+import com.mycompany.tictactoeshared.TwoPlayerDTO;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -220,9 +221,10 @@ public class ClientHandler extends Thread {
         }
 
         if (sender != null && receiver != null) {
-           Request r = new Request(RequestType.ACCEPT_INVITE, null);
-           sender.output.writeObject(r);
-            receiver.output.writeObject(r);
+           Request r1 = new Request(RequestType.ACCEPT_INVITE, new TwoPlayerDTO(sender.getPlayer(), receiver.getPlayer()));
+           Request r2 = new Request(RequestType.ACCEPT_INVITE, new TwoPlayerDTO(receiver.getPlayer(), sender.getPlayer()));
+           sender.output.writeObject(r1);
+           receiver.output.writeObject(r2);
           startGameInOnlineMode(sender,receiver);
         }
     }
