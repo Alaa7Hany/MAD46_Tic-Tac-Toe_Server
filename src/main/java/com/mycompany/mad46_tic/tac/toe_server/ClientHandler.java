@@ -5,7 +5,7 @@
 package com.mycompany.mad46_tic.tac.toe_server;
 
 import com.mycompany.mad46_tic_tac_toe_server.db.DatabaseHandler;
-import com.mycompany.mad46_tic_tac_toe_server.db.UserAuthException;
+import com.mycompany.mad46_tic_tac_toe_server.db.CustomException;
 import com.mycompany.tictactoeshared.InvitationDTO;
 import com.mycompany.tictactoeshared.LoginDTO;
 import com.mycompany.tictactoeshared.MoveDTO;
@@ -88,8 +88,8 @@ public class ClientHandler extends Thread {
                         handleMove((MoveDTO) received.getData());
                         break;
                     case LOGOUT:
-                        handleLogout(); 
-                         break;
+                        handleLogout();
+                        break;
                     case REMATCH_REQUEST:
                         handleRematch((RematchDTO) received.getData());
                         break;
@@ -115,7 +115,7 @@ public class ClientHandler extends Thread {
             this.currentPlayer = playerData;
             response = new Response(Response.Status.SUCCESS, playerData);
 
-        } catch (UserAuthException ex) {
+        } catch (CustomException ex) {
             response = new Response(Response.Status.FAILURE, ex.getMessage());
         } catch (SQLException ex) {
             System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -144,7 +144,7 @@ public class ClientHandler extends Thread {
 
             response = new Response(Response.Status.SUCCESS, playerData);
             this.currentPlayer = playerData;
-        } catch (UserAuthException ex) {
+        } catch (CustomException ex) {
             response = new Response(Response.Status.FAILURE, ex.getMessage());
         } catch (SQLException ex) {
             System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
@@ -264,9 +264,6 @@ public class ClientHandler extends Thread {
     private void getOnlinePlayersForLobby() {
 
         try {
-//            List<PlayerDTO> initialPlayers
-//                    = new DatabaseHandler().getOnlinePlayersForLobby();
-
             Vector<ClientHandler> currentClients = new Vector<>(TicTacToeServer.clients);
 
             List<PlayerDTO> players = new ArrayList<>();
@@ -319,7 +316,15 @@ public class ClientHandler extends Thread {
             if (moveDTO.getSymbol().equalsIgnoreCase("x")) {
 
                 if (session.playerO != null) {
-
+                    if (moveDTO.isWin()) {
+                        try {
+                            new DatabaseHandler().increaseScore(session.playerX.currentPlayer.getUsername());
+                        } catch (SQLException ex) {
+                            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                        } catch (CustomException ex) {
+                            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                        }
+                    }
                     Request r = new Request(RequestType.MOVE, moveDTO);
                     session.playerO.output.writeObject(r);
                     session.playerO.output.flush();
@@ -328,7 +333,15 @@ public class ClientHandler extends Thread {
             } else if (moveDTO.getSymbol().equalsIgnoreCase("o")) {
 
                 if (session.playerX != null) {
-
+                    if (moveDTO.isWin()) {
+                        try {
+                            new DatabaseHandler().increaseScore(session.playerO.currentPlayer.getUsername());
+                        } catch (SQLException ex) {
+                            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                        } catch (CustomException ex) {
+                            System.getLogger(ClientHandler.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                        }
+                    }
                     Request r = new Request(RequestType.MOVE, moveDTO);
                     session.playerX.output.writeObject(r);
                     session.playerX.output.flush();
@@ -340,9 +353,9 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
     }
-    
-    private void handleLogout(){
-        System.out.println(currentPlayer.getUsername()+"logout");
+
+    private void handleLogout() {
+        System.out.println(currentPlayer.getUsername() + "logout");
         TicTacToeServer.clients.remove(this);
         TicTacToeServer.broadCastPlayerList();
         closeConnection();
@@ -351,7 +364,7 @@ public class ClientHandler extends Thread {
     private void handleRematch(RematchDTO dto) {
 
         GameSession session = TicTacToeServer.sessions.get(dto.getSessionId());
-
+        System.out.println("##################handleRematch: " + dto.getUsername() );
         if (session == null) {
             return;
         }
@@ -370,7 +383,6 @@ public class ClientHandler extends Thread {
     }
 
     private void startRematch(GameSession oldSession) {
-
         String oldId = oldSession.sessionID;
 
         String newSessionId = UUID.randomUUID().toString();
@@ -384,6 +396,8 @@ public class ClientHandler extends Thread {
         TicTacToeServer.sessions.put(newSessionId, newSession);
 
         try {
+             System.out.println("-------------------startRematch"  );
+
             oldSession.playerX.getOutput().writeObject(
                     new Request(
                             RequestType.START_GAME,

@@ -8,8 +8,8 @@ package com.mycompany.mad46_tic_tac_toe_server.db;
  *
  * @author hp
  */
-public class UserAuthException extends Exception {
-    public UserAuthException(String message) {
+public class CustomException extends Exception {
+    public CustomException(String message) {
         super(message);
     }
 }
