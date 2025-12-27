@@ -278,10 +278,8 @@ public class ClientHandler extends Thread {
 
             System.out.println("##################Number of players: " + players.size());
 
-            Response response
-                    = new Response(Response.Status.SUCCESS, players);
-
-            output.writeObject(response);
+            Request request = new Request(RequestType.GET_ONLINE_PLAYERS, players);
+            output.writeObject(request);
             output.flush();
 
         } catch (IOException ex) {
