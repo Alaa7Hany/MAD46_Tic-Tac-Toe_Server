@@ -24,11 +24,11 @@ public class DatabaseHandler {
         this.conn = DBManager.getConnection();
     }
 
-    public PlayerDTO login(LoginDTO loginDTO) throws UserAuthException {
+    public PlayerDTO login(LoginDTO loginDTO) throws CustomException {
         
         // Check first if the user exist or not, if not then throw exception
         if(!isUserExist(loginDTO.getUsername())){
-            throw new UserAuthException("Player Doesn't exist");
+            throw new CustomException("Player Doesn't exist");
         }
 
         String sql =
@@ -50,20 +50,20 @@ public class DatabaseHandler {
                 );
             }else{
                 // the user does exist but the password is wrong
-                throw new UserAuthException("Wrong Password");
+                throw new CustomException("Wrong Password");
             }
             
 
         } catch (SQLException e) {
         }
         
-        throw new UserAuthException("Something went Wrong");
+        throw new CustomException("Something went Wrong");
     }
 
-    public PlayerDTO register(LoginDTO loginDTO) throws UserAuthException {
+    public PlayerDTO register(LoginDTO loginDTO) throws CustomException {
         
         if(isUserExist(loginDTO.getUsername())){
-            throw new UserAuthException("Player already exist");
+            throw new CustomException("Player already exist");
         }
 
         String sql =
@@ -86,7 +86,7 @@ public class DatabaseHandler {
 
         } catch (SQLException e) {
         }
-        throw new UserAuthException("Something went wrong");
+        throw new CustomException("Something went wrong");
     }
     
 
@@ -152,7 +152,33 @@ public class DatabaseHandler {
         return offlineNum;
     }
     
-    
+    public void increaseScore(String username) throws CustomException {
+
+
+    if (!isUserExist(username)) {
+        throw new CustomException("Player Doesn't exist");
+    }
+
+    String sql =
+        "UPDATE USERS " +
+        "SET SCORE = SCORE + 1 " +
+        "WHERE NAME = ?";
+
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, username);
+
+        int rowsUpdated = ps.executeUpdate();
+
+        if (rowsUpdated == 0) {
+            throw new CustomException("Score not updated");
+        }
+
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+    }
+}
+
     private boolean isUserExist(String userName){
         String sql =  "SELECT NAME FROM USERS WHERE NAME=?";
         try(PreparedStatement ps = conn.prepareStatement(sql)){
