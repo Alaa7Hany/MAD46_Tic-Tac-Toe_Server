@@ -1,15 +1,10 @@
 ----------------------------------------------------------------
-Sun Dec 28 17:30:48 EET 2025D001 : [0] The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585), [1] a816c00e-019b-6595-6716-0000122ff4d0, [2] C:\Users\hp\Desktop\ITI\Java\JavaFX\TicTacToeServer\TicTacToeDB, [3] jdk.internal.loader.ClassLoaders$AppClassLoader@49476842, [4] file:/C:/Users/hp/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar
+Sun Dec 28 19:29:53 EET 2025D001 : [0] The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585), [1] a816c00e-019b-6602-6a0b-00001dfe9ed8, [2] C:\Users\siam\Desktop\iti\5-java\project\MAD46_Tic-Tac-Toe_Server\TicTacToeDB, [3] jdk.internal.loader.ClassLoaders$AppClassLoader@49476842, [4] file:/C:/Users/siam/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar
 java.vendor=Azul Systems, Inc.
 java.runtime.version=25.0.1+8-LTS
-user.dir=C:\Users\hp\Desktop\ITI\Java\JavaFX\TicTacToeServer
-os.name=Windows 11
+user.dir=C:\Users\siam\Desktop\iti\5-java\project\MAD46_Tic-Tac-Toe_Server
+os.name=Windows 10
 os.arch=amd64
 os.version=10.0
 derby.system.home=null
 C005 : [0] 
-----------------------------------------------------------------
-J003 : [0] Sun Dec 28 17:30:58 EET 2025
-----------------------------------------------------------------
-Sun Dec 28 17:30:58 EET 2025D002 : [0] a816c00e-019b-6595-6716-0000122ff4d0, [1] C:\Users\hp\Desktop\ITI\Java\JavaFX\TicTacToeServer\TicTacToeDB, [2] jdk.internal.loader.ClassLoaders$AppClassLoader@49476842
-----------------------------------------------------------------
