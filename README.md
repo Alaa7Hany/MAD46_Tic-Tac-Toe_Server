@@ -2,7 +2,7 @@
 ![Static Badge](https://img.shields.io/badge/Java%20-red?style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/JavaFX%20-burble?style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/MySQL%20-blue?style=for-the-badge)
-## MAD46_TicTacToeServer – JavaFX Multiplayer & Single Player Tic-Tac-Toe
+## MAD46_TicTacToeServer 
 
 A Multiplayer TicTacToe server with JavaFX admin dashboard for supporting online matches.
 This is the Server for TicTacToe Game https://github.com/Alaa7Hany/MAD46_Tic-Tac-Toe_Client
