@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import javafx.scene.image.Image;
 
 /**
  * JavaFX App
@@ -23,8 +24,12 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
+        stage.setTitle("TicTacToe-Server");
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("/images/xo.png")));
+
         stage.setResizable(false);
         stage.show();
+        
     }
 
     static void setRoot(String fxml) throws IOException {
