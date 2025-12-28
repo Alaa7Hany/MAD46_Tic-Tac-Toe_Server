@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * JavaFX App
@@ -37,10 +39,15 @@ public class App extends Application {
     @Override
     public void stop() throws Exception {
         TicTacToeServer.clearClients();
+        try {
+            DriverManager.getConnection("jdbc:derby:;shutdown=true");
+        } catch (SQLException e) {
+            if ("XJ015".equals(e.getSQLState())) {
+                System.out.println("Derby shut down normally");
+            }
+        }
         super.stop(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
-    
-    
 
     public static void main(String[] args) {
         try {

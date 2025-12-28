@@ -6,7 +6,6 @@ module com.mycompany.mad46_tic.tac.toe_server {
     exports com.mycompany.mad46_tic.tac.toe_server;
     requires com.mycompany.tictactoeshared;
     requires java.sql;
-    requires derbyclient;
     requires java.base;
 
 }
