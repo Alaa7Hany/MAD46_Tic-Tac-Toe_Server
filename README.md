@@ -5,6 +5,7 @@
 ## MAD46_TicTacToeServer 
 
 A Multiplayer TicTacToe server with JavaFX admin dashboard for supporting online matches.
+
 This is the Server for TicTacToe Game https://github.com/Alaa7Hany/MAD46_Tic-Tac-Toe_Client
 
 
@@ -16,11 +17,13 @@ This is the Server for TicTacToe Game https://github.com/Alaa7Hany/MAD46_Tic-Tac
 * TicTacToe Shared Library : https://github.com/Alaa7Hany/MAD46_Tic-Tac-Toe_Shared
 * MySQL Server 8.0+
 
-#### Eun the Server:
+#### Run the Server:
 
-* Open server project
+* Open server project 
 * Make sure JavaFX libraries are configured
 * Run its main class and start the Server
+
+##### Or open Server.jar and start the Server
 
 ### Features:
 * Multiplayer online TicTacToe
